@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import QuizOptions from './QuizOptions';
+import classNames from 'classnames';
 import '../App.css';
 
 class Quiz extends Component {
@@ -15,10 +16,13 @@ class Quiz extends Component {
     }
       this.renderOptions= this.renderOptions.bind(this);
       this.checkResults = this.checkResults.bind(this);
+      this.play = this.play.bind(this);
   }
+
       randomNumber(min, max){
         return Math.floor(Math.random() * (max-min + 1) + min);
       }
+
       playGame(){
         const field1= this.randomNumber(20,50);
         const filed2= this.randomNumber(20,50);
@@ -35,8 +39,16 @@ class Quiz extends Component {
             field2: filed2,
             answer: result
           };
-          return riddle;
+
+        if(this.state && this.state.gameOver){
+          this.setState({
+            riddle:riddle,
+          });
+          } else {
+            return riddle;
+          }
         }
+
 
         generateRandomOptions(sum) {
           let result = sum;
@@ -74,6 +86,13 @@ class Quiz extends Component {
             this.setState({correct: false, gameOver: true});
           }
         }
+          renderMessage(){
+            if(this.state.correct){
+              return <h3>Good job! Press the button to play again </h3>
+            } else {
+              return <h3>Wrong answer! Press the button to play again </h3>
+            }
+          }
 
         renderOptions(){
           return (
@@ -85,31 +104,36 @@ class Quiz extends Component {
             </div>
           );
         }
+        play(){
+          this.setState({correct:false, gameOver: false});
+          this.playGame();
+        }
 
-  render() {
-    return (
-      <div className="quiz">
-        <div className="quiz-content">
-          <p className="question">What is the sum of <span></span>
-            <span className="text-info">
-              {this.state.riddle.field1}
-            </span>
-             <span> and </span>
-            <span className="text-info">
-              {this.state.riddle.field2}
-            </span>
-            ?</p>
-          {this.renderOptions()}
-        </div>
-        Correct: {this.state.correct  ? "True" :"False"} <br/>
-        gameOver: {this.state.gameOver ? "True" :"False"}
-        <div className="play-again">
-          <a className="button">Play Again</a>
-        </div>
-      </div>
-
-    )
-  }
-}
-
+      render() {
+        return (
+          <div className="quiz">
+            <div className="quiz-content">
+              <p className="question">What is the sum of <span></span>
+                <span className="text-info">
+                  {this.state.riddle.field1}
+                </span>
+                 <span> and </span>
+                <span className="text-info">
+                  {this.state.riddle.field2}
+                </span>
+                ?</p>
+              {this.renderOptions()}
+            </div>
+            Correct: {this.state.correct  ? "True" :"False"} <br/>
+            gameOver: {this.state.gameOver ? "True" :"False"}
+            <div className={classNames("after",{"hide": !this.state.gameOver},{'wrong': !this.state.correct}, {"correct":this.state.correct })}>
+              {this.renderMessage()}
+            </div>
+            <div className="play-again">
+              <a className="button" onClick={this.play}>Play Again</a>
+            </div>
+          </div>
+        )
+      }
+    }
 export default Quiz
